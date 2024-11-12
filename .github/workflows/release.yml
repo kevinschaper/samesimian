@@ -1,0 +1,91 @@
+name: Run Jupyter Notebook and Create Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  run-notebook:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11'
+
+    - name: Install `uv`
+      run: |
+        pip install uv
+
+    - name: Install dependencies
+      run: |
+        uv pip install -r requirements.txt
+
+    - name: Run Jupyter Notebook
+      run: |
+        uv jupyter nbconvert --to notebook --execute omim_vs_orphanet_comparison.ipynb --output omim_vs_orphanet_comparison_output.ipynb
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: phenotype_profiles_by_source
+        path: phenotype_profiles_by_source.parquet
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: phenotype_profile_comparison_results
+        path: phenotype_profile_comparison_results.json
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: phenotype_profile_comparison_scores
+        path: phenotype_profile_comparison_scores.tsv
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: 'Release Candidate ${{ github.ref }}'
+        draft: false
+        prerelease: true
+
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: phenotype_profiles_by_source.parquet
+        asset_name: phenotype_profiles_by_source.parquet
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: phenotype_profile_comparison_results.json
+        asset_name: phenotype_profile_comparison_results.json
+        asset_content_type: application/json
+
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: phenotype_profile_comparison_scores.tsv
+        asset_name: phenotype_profile_comparison_scores.tsv
+        asset_content_type: text/tab-separated-values
