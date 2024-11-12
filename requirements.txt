@@ -3,3 +3,4 @@ duckdb
 pandas
 fastparquet
 semsimian
+papermill

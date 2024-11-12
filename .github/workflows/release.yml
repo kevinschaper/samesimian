@@ -32,7 +32,7 @@ jobs:
     - name: Run Jupyter Notebook
       run: |
         source .venv/bin/activate
-        jupyter nbconvert --to notebook --execute omim_vs_orphanet_comparison.ipynb --output omim_vs_orphanet_comparison_output.ipynb --stdout
+        papermill omim_vs_orphanet_comparison.ipynb output/omim_vs_orphanet_comparison_output.ipynb --log-output        
 
     - name: Get Date for Release Tag
       run: echo "DATE=$(date +%Y-%m-%d)" >> $GITHUB_ENV
