@@ -1,9 +1,6 @@
 name: Run Jupyter Notebook and Create Release
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
