@@ -1,0 +1,5 @@
+notebook
+duckdb
+pandas
+fastparquet
+semsimian
