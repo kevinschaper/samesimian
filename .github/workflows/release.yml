@@ -26,12 +26,12 @@ jobs:
 
     - name: Activate venv and Install dependencies
       run: |
-        source venv/bin/activate
+        source .venv/bin/activate
         uv pip install -r requirements.txt
 
     - name: Run Jupyter Notebook
       run: |
-        source venv/bin/activate
+        source .venv/bin/activate
         jupyter nbconvert --to notebook --execute omim_vs_orphanet_comparison.ipynb --output omim_vs_orphanet_comparison_output.ipynb
 
     - name: Get Date for Release Tag
