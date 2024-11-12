@@ -31,61 +31,14 @@ jobs:
       run: |
         uv jupyter nbconvert --to notebook --execute omim_vs_orphanet_comparison.ipynb --output omim_vs_orphanet_comparison_output.ipynb
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: phenotype_profiles_by_source
-        path: phenotype_profiles_by_source.parquet
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: phenotype_profile_comparison_results
-        path: phenotype_profile_comparison_results.json
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: phenotype_profile_comparison_scores
-        path: phenotype_profile_comparison_scores.tsv
+    - name: Get Date for Release Tag
+      run: echo "DATE=$(date +%Y-%m-%d)" >> $GITHUB_ENV
 
     - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.ref }}
-        release_name: 'Release Candidate ${{ github.ref }}'
-        draft: false
-        prerelease: true
-
-    - name: Upload Release Assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: phenotype_profiles_by_source.parquet
-        asset_name: phenotype_profiles_by_source.parquet
-        asset_content_type: application/octet-stream
-
-    - name: Upload Release Assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: phenotype_profile_comparison_results.json
-        asset_name: phenotype_profile_comparison_results.json
-        asset_content_type: application/json
-
-    - name: Upload Release Assets
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: phenotype_profile_comparison_scores.tsv
-        asset_name: phenotype_profile_comparison_scores.tsv
-        asset_content_type: text/tab-separated-values
+        tag_name: ${{ env.DATE }}
+        files: |
+          output/*
+        generate_release_notes: true
+        draft: true
